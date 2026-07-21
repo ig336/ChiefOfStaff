@@ -1,0 +1,13 @@
+{
+  "name": "chief-of-staff-os",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Connector-ready chief of staff workspace for email, calendar, GTM outreach, Notion/Kanban, and meeting intelligence.",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,418 @@
+:root {
+  --ink: #16201d;
+  --muted: #65716d;
+  --line: #d8dfdc;
+  --paper: #f4f6f2;
+  --panel: #ffffff;
+  --green: #1f7a5b;
+  --green-soft: #dff1e7;
+  --blue: #2267a8;
+  --blue-soft: #dcebf7;
+  --amber: #9a6a05;
+  --amber-soft: #f5e7bd;
+  --red: #a23b2a;
+  --red-soft: #f4d6cf;
+  --shadow: 0 18px 40px rgba(22, 32, 29, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+button {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+  color: var(--ink);
+  cursor: pointer;
+  min-height: 36px;
+  padding: 8px 12px;
+}
+
+button:hover {
+  border-color: var(--ink);
+}
+
+.primary {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: white;
+}
+
+#app {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.rail {
+  background: #fbfcfa;
+  border-right: 1px solid var(--line);
+  padding: 20px 14px;
+}
+
+.brand {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.brand span {
+  background: var(--ink);
+  border-radius: 8px;
+  color: white;
+  display: grid;
+  font-weight: 800;
+  height: 42px;
+  place-items: center;
+  width: 42px;
+}
+
+small,
+.brand small,
+p {
+  color: var(--muted);
+}
+
+nav {
+  display: grid;
+  gap: 6px;
+}
+
+.nav {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  justify-content: start;
+  text-align: left;
+  width: 100%;
+}
+
+.nav.active {
+  background: var(--green-soft);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.rail-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-top: 24px;
+  padding: 14px;
+}
+
+.workspace {
+  min-width: 0;
+  padding: 24px;
+}
+
+.topbar {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 30px;
+  letter-spacing: 0;
+}
+
+h2 {
+  font-size: 16px;
+  letter-spacing: 0;
+}
+
+.metrics,
+.meta,
+.button-row,
+.quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.badge {
+  align-items: center;
+  background: #eef1ee;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  display: inline-flex;
+  font-size: 12px;
+  min-height: 28px;
+  padding: 5px 9px;
+  white-space: nowrap;
+}
+
+.badge.good {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.badge.warn {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+.badge.danger {
+  background: var(--red-soft);
+  color: var(--red);
+}
+
+.toast {
+  background: var(--blue-soft);
+  border: 1px solid #bdd5ea;
+  border-radius: 8px;
+  color: #18476f;
+  margin-bottom: 16px;
+  padding: 11px 14px;
+}
+
+.command-grid,
+.two-col,
+.generated-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  margin-bottom: 16px;
+}
+
+.generated-grid {
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
+}
+
+.command-box,
+.panel,
+.column,
+.connector {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+.command-box label {
+  color: var(--muted);
+  display: block;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.input-row {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr 92px;
+}
+
+textarea {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  min-height: 88px;
+  padding: 12px;
+  resize: vertical;
+  width: 100%;
+}
+
+.quick-actions {
+  margin-top: 10px;
+}
+
+.section-head {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.section-head.tight {
+  margin-bottom: 6px;
+}
+
+.timeline {
+  display: grid;
+  gap: 10px;
+}
+
+.timeline div {
+  align-items: start;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 12px 1fr;
+}
+
+.timeline span {
+  background: var(--green);
+  border-radius: 999px;
+  height: 10px;
+  margin-top: 5px;
+  width: 10px;
+}
+
+.approval {
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--amber);
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 13px;
+}
+
+.source-panel {
+  border-top: 4px solid var(--line);
+}
+
+.source-panel.gmail {
+  border-top-color: var(--green);
+}
+
+.source-panel.calendar {
+  border-top-color: var(--blue);
+}
+
+.source-panel.notion {
+  border-top-color: var(--amber);
+}
+
+.source-panel.gtm {
+  border-top-color: var(--red);
+}
+
+.mini-card {
+  background: #f9faf8;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 7px;
+  margin-top: 10px;
+  padding: 11px;
+}
+
+.mini-card span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.approval.approved {
+  border-left-color: var(--green);
+}
+
+.approval.rejected {
+  opacity: 0.58;
+}
+
+.approval p,
+.gtm-card p,
+.rail-card p {
+  line-height: 1.45;
+  margin-top: 4px;
+}
+
+.draft {
+  min-height: 210px;
+}
+
+.table,
+.calendar-list,
+.gtm-list,
+.connectors {
+  display: grid;
+  gap: 10px;
+}
+
+.row,
+.event,
+.gtm-card,
+.connector {
+  align-items: center;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 180px minmax(0, 1fr) auto auto;
+}
+
+.event {
+  grid-template-columns: 90px minmax(0, 1fr) auto auto;
+}
+
+.gtm-card {
+  grid-template-columns: minmax(0, 1fr) 70px auto;
+}
+
+.score {
+  background: var(--green-soft);
+  border-radius: 8px;
+  color: var(--green);
+  font-size: 24px;
+  font-weight: 800;
+  padding: 12px;
+  text-align: center;
+}
+
+.board {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.board-card {
+  background: #f9faf8;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 12px;
+}
+
+@media (max-width: 960px) {
+  #app,
+  .command-grid,
+  .two-col,
+  .generated-grid,
+  .board,
+  .row,
+  .event,
+  .gtm-card,
+  .connector,
+  .input-row {
+    grid-template-columns: 1fr;
+  }
+
+  .rail {
+    border-bottom: 1px solid var(--line);
+    border-right: 0;
+  }
+
+  nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .topbar {
+    align-items: start;
+    display: grid;
+    gap: 12px;
+  }
+}
