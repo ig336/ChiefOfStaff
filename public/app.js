@@ -46,10 +46,63 @@ const state = {
     { from: "Arun Patel", subject: "Investor intro to Head of Growth", urgency: "Medium", status: "Draft warm ask" },
     { from: "Customer Ops", subject: "Renewal risk", urgency: "High", status: "Escalate" }
   ],
+  generatedMail: [
+    {
+      id: "mail-maya",
+      to: "Maya Chen",
+      subject: "Re: Partnership terms",
+      sendAt: "Today 12:30 PM",
+      state: "Draft",
+      body:
+        "Thanks for sending this over. I reviewed the terms and have a few edits around clause 4 before we can approve. I am looping in legal and will send redlines by end of day."
+    },
+    {
+      id: "mail-arun",
+      to: "Arun Patel",
+      subject: "Intro request: VP Growth at Mercury",
+      sendAt: "Today 3:00 PM",
+      state: "Draft",
+      body:
+        "Would you be open to introducing me to the VP Growth at Mercury? The context is timely given their lifecycle hiring push, and I can send a short forwardable note."
+    },
+    {
+      id: "mail-ops",
+      to: "Customer Ops",
+      subject: "Renewal risk follow-up",
+      sendAt: "Tomorrow 9:15 AM",
+      state: "Draft",
+      body:
+        "I saw the renewal risk note and agree we should move quickly. I drafted next steps, owner assignments, and a customer-facing apology with a clear recovery timeline."
+    }
+  ],
   events: [
-    { time: "11:00 AM", title: "Product leadership", status: "Protected" },
-    { time: "2:00 PM", title: "Customer sync", status: "At risk" },
-    { time: "4:30 PM", title: "Founder catch-up", status: "Move async" }
+    {
+      id: "evt-product",
+      time: "11:00 AM",
+      title: "Product leadership",
+      status: "Protected",
+      scheduled: true,
+      attendees: "Leadership team",
+      action: "Keep meeting and prepare agenda"
+    },
+    {
+      id: "evt-customer",
+      time: "2:00 PM",
+      title: "Customer sync",
+      status: "At risk",
+      scheduled: false,
+      attendees: "Maya, Customer Ops",
+      action: "Cancel and send reschedule email"
+    },
+    {
+      id: "evt-founder",
+      time: "4:30 PM",
+      title: "Founder catch-up",
+      status: "Move async",
+      scheduled: false,
+      attendees: "Founder",
+      action: "Convert to async update"
+    }
   ],
   board: {
     Today: ["Product leadership prep", "Maya partnership response"],
@@ -101,6 +154,7 @@ function badge(text, tone = "") {
 function renderShell(content) {
   const pending = state.approvals.filter((item) => item.state === "Pending").length;
   const connected = state.connectors.filter((item) => item.status === "Connected").length;
+  const scheduled = state.events.filter((item) => item.scheduled).length;
 
   root.innerHTML = `
     <aside class="rail">
@@ -133,7 +187,8 @@ function renderShell(content) {
         </div>
         <div class="metrics">
           ${badge(`${pending} approvals`, pending ? "warn" : "good")}
-          ${badge(`${state.inbox.length} priority emails`)}
+          ${badge(`${state.generatedMail.length} Gmail drafts`, "good")}
+          ${badge(`${scheduled}/${state.events.length} meetings scheduled`)}
           ${badge(`${state.gtm.length} GTM paths`)}
         </div>
       </header>
@@ -172,16 +227,16 @@ function renderCommand() {
       <section class="panel source-panel gmail">
         <div class="section-head">
           <h2>Generated Gmail Drafts</h2>
-          ${badge("3 drafts", "good")}
+          ${badge(`${state.generatedMail.length} drafts`, "good")}
         </div>
-        ${state.inbox
+        ${state.generatedMail
           .map(
             (mail) => `
             <article class="mini-card">
-              <strong>${mail.from}</strong>
+              <strong>${mail.to}</strong>
               <p>${mail.subject}</p>
-              <span>Suggested: ${mail.status}</span>
-              <button data-action="draft-one" data-subject="${mail.subject}">Open draft</button>
+              <span>${mail.state} · ${mail.sendAt}</span>
+              <button data-action="open-mail" data-id="${mail.id}">Open generated mail</button>
             </article>`
           )
           .join("")}
@@ -196,8 +251,8 @@ function renderCommand() {
             (event) => `
             <article class="mini-card">
               <strong>${event.time} · ${event.title}</strong>
-              <p>Status: ${event.status}</p>
-              <button data-action="reschedule" data-title="${event.title}">Generate reschedule</button>
+              <p>${event.scheduled ? "Still scheduled" : "Removed from schedule"} · ${event.action}</p>
+              <button data-action="toggle-meeting" data-id="${event.id}">${event.scheduled ? "Unschedule" : "Schedule"}</button>
             </article>`
           )
           .join("")}
@@ -274,42 +329,95 @@ function renderApproval(item) {
 
 function renderInbox() {
   renderShell(`
-    <section class="panel">
-      <div class="section-head"><h2>Gmail Priority Inbox</h2><button data-action="draft-replies">Draft replies</button></div>
-      <div class="table">
-        ${state.inbox
+    <section class="mail-layout">
+      <section class="panel">
+        <div class="section-head"><h2>Gmail Priority Inbox</h2><button data-action="draft-replies">Regenerate replies</button></div>
+        <div class="table">
+          ${state.inbox
+            .map(
+              (mail) => `
+              <div class="row">
+                <strong>${mail.from}</strong>
+                <span>${mail.subject}</span>
+                ${badge(mail.urgency, mail.urgency === "High" ? "danger" : "warn")}
+                <button data-action="draft-one" data-subject="${mail.subject}">Draft</button>
+              </div>`
+            )
+            .join("")}
+        </div>
+      </section>
+      <section class="panel">
+        <div class="section-head"><h2>Generated Gmail Outbox</h2>${badge("editable")}</div>
+        <div class="mail-stack">
+          ${state.generatedMail
           .map(
             (mail) => `
-            <div class="row">
-              <strong>${mail.from}</strong>
-              <span>${mail.subject}</span>
-              ${badge(mail.urgency, mail.urgency === "High" ? "danger" : "warn")}
-              <button data-action="draft-one" data-subject="${mail.subject}">Draft</button>
-            </div>`
+            <article class="mail-card">
+              <div class="section-head tight">
+                <strong>${mail.subject}</strong>
+                ${badge(mail.state, mail.state === "Scheduled" ? "good" : "warn")}
+              </div>
+              <p><b>To:</b> ${mail.to} · <b>Send:</b> ${mail.sendAt}</p>
+              <textarea data-mail-body="${mail.id}">${mail.body}</textarea>
+              <div class="button-row">
+                <button data-action="save-mail" data-id="${mail.id}">Save</button>
+                <button data-action="schedule-mail" data-id="${mail.id}">Schedule in Gmail</button>
+                <button class="primary" data-action="approve-mail" data-id="${mail.id}">Approve send</button>
+              </div>
+            </article>`
           )
           .join("")}
-      </div>
+        </div>
+      </section>
     </section>
   `);
 }
 
 function renderCalendar() {
   renderShell(`
-    <section class="panel">
-      <div class="section-head"><h2>Google Calendar Recovery</h2><button data-action="recover-calendar">Recover afternoon</button></div>
-      <div class="calendar-list">
+    <section class="calendar-layout">
+      <section class="panel">
+        <div class="section-head"><h2>Google Calendar Recovery</h2><button data-action="recover-calendar">Recover afternoon</button></div>
+        <div class="day-strip">
+          <strong>Today</strong>
+          <span>Focus block protected from 1:00 PM onward</span>
+          ${badge(`${state.events.filter((event) => event.scheduled).length} active meetings`)}
+        </div>
+        <div class="calendar-list">
         ${state.events
           .map(
             (event) => `
             <article class="event">
               <span>${event.time}</span>
-              <strong>${event.title}</strong>
+              <div>
+                <strong>${event.title}</strong>
+                <p>${event.attendees} · ${event.action}</p>
+              </div>
               ${badge(event.status, event.status === "At risk" ? "danger" : "")}
-              <button data-action="reschedule" data-title="${event.title}">Reschedule</button>
+              <label class="switch">
+                <input type="checkbox" data-action="meeting-switch" data-id="${event.id}" ${event.scheduled ? "checked" : ""} />
+                <span></span>
+              </label>
+              <button data-action="reschedule" data-title="${event.title}">Generate email</button>
             </article>`
           )
           .join("")}
-      </div>
+        </div>
+      </section>
+      <section class="panel">
+        <div class="section-head"><h2>Schedule Preview</h2>${badge("Google Calendar")}</div>
+        <div class="schedule-preview">
+          ${state.events
+            .map(
+              (event) => `
+              <div class="slot ${event.scheduled ? "active" : "muted-slot"}">
+                <span>${event.time}</span>
+                <strong>${event.scheduled ? event.title : `${event.title} removed`}</strong>
+              </div>`
+            )
+            .join("")}
+        </div>
+      </section>
     </section>
   `);
 }
@@ -392,6 +500,14 @@ function approve(id) {
   setToast(`${item.title} approved. It is queued for execution.`);
 }
 
+function findMail(id) {
+  return state.generatedMail.find((mail) => mail.id === id);
+}
+
+function findEvent(id) {
+  return state.events.find((event) => event.id === id);
+}
+
 document.addEventListener("click", (event) => {
   const button = event.target.closest("button");
   if (!button) return;
@@ -434,8 +550,36 @@ document.addEventListener("click", (event) => {
   }
   if (action === "draft-replies") setToast("Created Gmail reply drafts for priority threads.");
   if (action === "draft-one") setToast(`Draft created for: ${button.dataset.subject}.`);
+  if (action === "open-mail") {
+    const mail = findMail(button.dataset.id);
+    state.view = "inbox";
+    setToast(`Opened generated Gmail draft for ${mail.to}.`);
+  }
+  if (action === "save-mail") {
+    const mail = findMail(button.dataset.id);
+    const editor = document.querySelector(`[data-mail-body="${mail.id}"]`);
+    mail.body = editor.value;
+    mail.state = "Draft";
+    setToast(`Saved Gmail draft: ${mail.subject}.`);
+  }
+  if (action === "schedule-mail") {
+    const mail = findMail(button.dataset.id);
+    mail.state = "Scheduled";
+    setToast(`${mail.subject} scheduled for ${mail.sendAt}.`);
+  }
+  if (action === "approve-mail") {
+    const mail = findMail(button.dataset.id);
+    mail.state = "Approved";
+    setToast(`${mail.subject} approved for Gmail send.`);
+  }
   if (action === "recover-calendar") setToast("Recovery plan created for afternoon Google Calendar events.");
   if (action === "reschedule") setToast(`Reschedule options prepared for ${button.dataset.title}.`);
+  if (action === "toggle-meeting") {
+    const meeting = findEvent(button.dataset.id);
+    meeting.scheduled = !meeting.scheduled;
+    meeting.status = meeting.scheduled ? "Scheduled" : "Removed";
+    setToast(`${meeting.title} is now ${meeting.scheduled ? "scheduled" : "removed from schedule"}.`);
+  }
   if (action === "move-card") {
     const card = button.dataset.card;
     Object.values(state.board).forEach((cards) => {
@@ -462,6 +606,16 @@ document.addEventListener("click", (event) => {
     state.log.unshift(`Loaded preset: ${button.textContent}`);
     setToast("Preset loaded. Press Plan to generate actions.");
   }
+});
+
+document.addEventListener("change", (event) => {
+  const input = event.target.closest("input[data-action='meeting-switch']");
+  if (!input) return;
+  const meeting = findEvent(input.dataset.id);
+  meeting.scheduled = input.checked;
+  meeting.status = input.checked ? "Scheduled" : "Removed";
+  state.log.unshift(`${meeting.title}: ${input.checked ? "scheduled" : "unscheduled"} on Google Calendar`);
+  setToast(`${meeting.title} switched ${input.checked ? "on" : "off"} in the schedule preview.`);
 });
 
 render();
